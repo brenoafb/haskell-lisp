@@ -51,7 +51,7 @@ atom = Atom . T.pack <$> identifier
 quote :: Parser Expr
 quote = do
   char '\''
-  expr
+  Quote <$> expr
 
 list :: Parser Expr
 list = List <$> parens exprs
