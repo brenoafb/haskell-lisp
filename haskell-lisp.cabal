@@ -1,0 +1,84 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 4d0e5b68c0ad08c177c5ae24d547fe4120b11092004f2e8dda07ad4e367e7dc4
+
+name:           haskell-lisp
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/brenoafb/haskell-lisp#readme>
+homepage:       https://github.com/brenoafb/haskell-lisp#readme
+bug-reports:    https://github.com/brenoafb/haskell-lisp/issues
+author:         Breno Fatureto
+maintainer:     breno.afb@gmail.com
+copyright:      2021 Breno Fatureto
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/brenoafb/haskell-lisp
+
+library
+  exposed-modules:
+      Interpreter
+      Optimizer
+      Parser
+      Syntax
+      Typechecker
+  other-modules:
+      Paths_haskell_lisp
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , mtl
+    , parsec
+    , stm
+    , syb
+    , text
+  default-language: Haskell2010
+
+executable haskell-lisp-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_haskell_lisp
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , haskell-lisp
+    , mtl
+    , parsec
+    , stm
+    , syb
+    , text
+  default-language: Haskell2010
+
+test-suite haskell-lisp-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_haskell_lisp
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , haskell-lisp
+    , mtl
+    , parsec
+    , stm
+    , syb
+    , text
+  default-language: Haskell2010
