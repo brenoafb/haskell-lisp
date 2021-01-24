@@ -12,7 +12,7 @@ import qualified Data.Text as T
 
 type Program = [Expr]
 
-type Env = M.Map T.Text Expr
+type Env = [M.Map T.Text Expr]
 type Error = T.Text
 type Eval t = ExceptT Error (State Env) t
 
@@ -24,6 +24,9 @@ data Expr = Atom       T.Text
           | NativeFunc ([Expr] -> Eval Expr)
           | List       [Expr]
 
+true = Atom "#t"
+nil  = List []
+
 instance Show Expr where
   show (Atom t)       = T.unpack $ "Atom " <> t
   show (Str t)        = T.unpack $ "Str " <> "\"" <> t <> "\""
@@ -32,9 +35,12 @@ instance Show Expr where
   show (Quote x)      = "Quote " ++ show x
   show (NativeFunc x) = "<native function>"
   show (List xs)      = "List " ++ show xs
-  -- show (List xs) = show $
-  --   "("
-  --   <> foldr (\x acc -> x <> " " <> acc) "" $ map show xs
-  --   <> ")"
 
-
+display :: Expr -> T.Text
+display (Atom t)       = t
+display (Str t)        = "\"" <> t <> "\""
+display (IntExpr x)    = T.pack $ show x
+display (DoubleExpr x) = T.pack $ show x
+display (Quote t)      = "'" <> display t
+display (NativeFunc x) = "<native function>"
+display (List xs)      = "(" <> T.unwords (map display xs) <> ")"

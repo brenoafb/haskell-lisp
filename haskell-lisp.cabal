@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4d0e5b68c0ad08c177c5ae24d547fe4120b11092004f2e8dda07ad4e367e7dc4
+-- hash: e1c26ec904f9cde5657b6989e8fb7fe60d9c93405ba2f1c1718f3a1fc15239a9
 
 name:           haskell-lisp
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      BaseEnv
+      Env
       Interpreter
       Optimizer
       Parser

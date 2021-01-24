@@ -12,6 +12,8 @@ import qualified Data.Text as T
 
 languageDef =
   emptyDef { Token.commentLine     = ";"
+           , Token.identStart      = alphaNum <|> oneOf ":!#$%&*+./<=>?@\\^|-~"
+           , Token.identLetter     = alphaNum <|> oneOf ":!#$%&*+./<=>?@\\^|-~"
            }
 
 lexer = Token.makeTokenParser languageDef
