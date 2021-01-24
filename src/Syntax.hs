@@ -45,3 +45,13 @@ display (DoubleExpr x) = T.pack $ show x
 display (Quote t)      = "'" <> display t
 display (NativeFunc x) = "<native function>"
 display (List xs)      = "(" <> T.unwords (map display xs) <> ")"
+
+instance Eq Expr where
+  (Atom x)       == (Atom y)       = x == y
+  (Str  x)       == (Str  y)       = x == y
+  (IntExpr x)    == (IntExpr y)    = x == y
+  (DoubleExpr x) == (DoubleExpr y) = x == y
+  (Quote x)      == (Quote y)      = x == y
+  (List xs)      == (List ys)      = xs == ys
+  _              == _              = False
+

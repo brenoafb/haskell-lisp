@@ -40,6 +40,12 @@ baseEnv = [M.fromList
        args' <- mapM eval args
        return $ List args'
      ))
+  , ("eq?",
+     NativeFunc (\args ->
+       case args of
+         [x, y] -> if x == y then return true else return nil
+         _ -> throwError "eq?: invalid argument"
+     ))
   , ("type",
     NativeFunc (\args -> do
       args' <- mapM eval args

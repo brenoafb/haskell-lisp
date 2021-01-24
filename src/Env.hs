@@ -16,6 +16,7 @@ insert :: T.Text -> Expr -> Env -> Env
 insert k e (x:xs) =
   let x' = M.insert k e x
    in (x':xs)
+insert k e [] = [M.fromList [(k, e)]]
 
 push :: Frame -> Env -> Env
 push x xs = x:xs

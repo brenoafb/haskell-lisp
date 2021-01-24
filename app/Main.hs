@@ -13,13 +13,14 @@ import qualified Env as E
 import qualified Data.Text as T
 import qualified Data.Map as M
 
-runProgram :: Program -> IO ()
-runProgram [] = putStrLn ""
-runProgram (x:xs) = do
+runProgram :: Env -> Program -> IO ()
+runProgram env [] = putStrLn ""
+runProgram env (x:xs) = do
   putStrLn . T.unpack $ "> " <> display x
-  case evalState (runExceptT (eval x)) baseEnv of
-    Left err -> print err
-    Right r -> print r >> runProgram xs
+  putStrLn $ "> " ++ show x
+  case runState (runExceptT (eval x)) env of
+    (Left err, env') -> print err >> runProgram env' xs
+    (Right r, env')  -> print r >> runProgram env' xs
 
 main :: IO ()
 main = do
@@ -27,4 +28,4 @@ main = do
   case parseStr input of
     Left err -> print err
     Right p -> do
-      runProgram p
+      runProgram baseEnv p

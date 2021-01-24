@@ -28,10 +28,25 @@ eval e@(List []) = return e
 
 eval l@(List [Atom "lambda", List args, body]) = return l
 
+eval (List (Atom "cond" : [])) = return nil
+
+eval (List (Atom "cond" : List [cond, conseq] : xs)) = do
+  cond' <- eval cond
+  if cond == true
+     then eval conseq
+     else eval $ List ((Atom "cond") : xs)
+
 eval (List [Atom "define", Atom n, e]) = do
   e' <- eval e
   modify (E.insert n e')
   return true
+
+eval (List [Atom "let", List args, body]) = do
+  frame <- getLetBindings args
+  modify (E.push frame)
+  result <- eval body
+  modify E.pop
+  return result
 
 eval (List (x:xs)) = do
   env <- get
@@ -41,8 +56,8 @@ eval (List (x:xs)) = do
     List [Atom "lambda", List args, body] -> do
       xs' <- mapM eval xs
       names <- getArgNames args
-      let newFrame = M.fromList $ zip names xs'
-      modify (E.push newFrame)
+      let frame = M.fromList $ zip names xs'
+      modify (E.push frame)
       result <- eval body
       modify E.pop
       return result
@@ -56,3 +71,10 @@ getArgNames = mapM f
         f (Atom t) = return t
         f x        = throwError $ "Invalid argument " <> display x
 
+getLetBindings :: [Expr] -> Eval Frame
+getLetBindings xs = M.fromList <$> mapM f xs
+  where f :: Expr -> Eval (T.Text, Expr)
+        f (List [Atom name, e]) = do
+          e' <- eval e
+          return (name, e')
+        f x = throwError $ "Invalid let binding " <> display x
