@@ -4,7 +4,6 @@ module Interpreter where
 
 import Syntax
 import Parser
-import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
 import qualified Env as E
@@ -27,19 +26,33 @@ eval (Quote e) = return e
 
 eval e@(List []) = return e
 
-eval l@(List ((Atom "lambda"):xs)) = return l
+eval l@(List [Atom "lambda", List args, body]) = return l
 
 eval (List [Atom "define", Atom n, e]) = do
   e' <- eval e
   modify (E.insert n e')
   return true
 
-eval (List ((Atom x):xs)) = do
+eval (List (x:xs)) = do
   env <- get
-  case E.lookup x env of
-    Nothing -> throwError $ "Undefined function " <> x
-    Just (NativeFunc f) -> f xs
-    Just (List [Atom "lambda", args, body]) -> undefined -- TODO: apply lambda
-    _ -> throwError $ "Not a function: " <> x
+  x' <- eval x
+  case x' of
+    NativeFunc f -> f xs
+    List [Atom "lambda", List args, body] -> do
+      xs' <- mapM eval xs
+      names <- getArgNames args
+      let newFrame = M.fromList $ zip names xs'
+      modify (E.push newFrame)
+      result <- eval body
+      modify E.pop
+      return result
+    _ -> throwError $ "Not a function: " <> display x'
 
-eval e = throwError $ "Invalid expression " <> display e
+eval e = throwError $ "Invalid expression " <> T.pack (show e)
+
+getArgNames :: [Expr] -> Eval [T.Text]
+getArgNames = mapM f
+  where f :: Expr -> Eval T.Text
+        f (Atom t) = return t
+        f x        = throwError $ "Invalid argument " <> display x
+

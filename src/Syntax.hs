@@ -12,7 +12,8 @@ import qualified Data.Text as T
 
 type Program = [Expr]
 
-type Env = [M.Map T.Text Expr]
+type Frame = M.Map T.Text Expr
+type Env = [Frame]
 type Error = T.Text
 type Eval t = ExceptT Error (State Env) t
 

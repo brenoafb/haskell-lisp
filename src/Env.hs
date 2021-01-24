@@ -16,3 +16,10 @@ insert :: T.Text -> Expr -> Env -> Env
 insert k e (x:xs) =
   let x' = M.insert k e x
    in (x':xs)
+
+push :: Frame -> Env -> Env
+push x xs = x:xs
+
+pop :: Env -> Env
+pop [] = error "popping empty stack"  -- TODO find a bettew way of handling this case
+pop (_:xs) = xs
