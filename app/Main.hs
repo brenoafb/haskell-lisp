@@ -17,7 +17,6 @@ runProgram :: Env -> Program -> IO ()
 runProgram env [] = putStrLn ""
 runProgram env (x:xs) = do
   putStrLn . T.unpack $ "> " <> display x
-  putStrLn $ "> " ++ show x
   case runState (runExceptT (eval x)) env of
     (Left err, env') -> print err >> runProgram env' xs
     (Right r, env')  -> print r >> runProgram env' xs

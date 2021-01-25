@@ -32,7 +32,7 @@ eval (List (Atom "cond" : [])) = return nil
 
 eval (List (Atom "cond" : List [cond, conseq] : xs)) = do
   cond' <- eval cond
-  if cond == true
+  if cond' == true
      then eval conseq
      else eval $ List ((Atom "cond") : xs)
 
