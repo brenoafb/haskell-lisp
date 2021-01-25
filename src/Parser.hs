@@ -12,15 +12,15 @@ import qualified Data.Text as T
 
 languageDef =
   emptyDef { Token.commentLine     = ";"
-           , Token.identStart      = alphaNum <|> oneOf ":!#$%&*+./<=>?@\\^|-~"
-           , Token.identLetter     = alphaNum <|> oneOf ":!#$%&*+./<=>?@\\^|-~"
+           , Token.identStart      = alphaNum <|> oneOf ":!#$%&*+./<=>?@\\^|-~_"
+           , Token.identLetter     = alphaNum <|> oneOf ":!#$%&*+./<=>?@\\^|-~_"
            }
 
 lexer = Token.makeTokenParser languageDef
 
 identifier = Token.identifier lexer
 parens = Token.parens lexer
-int = fromIntegral <$> Token.integer lexer
+int = fromIntegral <$> Token.natural lexer
 double = Token.float lexer
 whiteSpace = Token.whiteSpace lexer
 comma = Token.comma lexer

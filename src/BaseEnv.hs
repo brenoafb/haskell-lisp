@@ -61,4 +61,32 @@ baseEnv = [M.fromList
         [_]       -> return nil
         _         -> throwError "type: invalid arguments"
      ))
+  , ("neg", NativeFunc (\args -> do
+      case args of
+        [IntExpr x]    -> return $ IntExpr (-x)
+        [DoubleExpr x] -> return $ DoubleExpr (-x)
+        _ -> throwError "neg: invalid arguments"
+     ))
+  , ("+.i", mkIntNumOp (+))
+  , ("-.i", mkIntNumOp (-))
+  , ("*.i", mkIntNumOp (*))
+  , ("/.i", mkIntNumOp div)
+  , ("mod", mkIntNumOp mod)
+  , ("+.f", mkDoubleNumOp (+))
+  , ("-.f", mkDoubleNumOp (-))
+  , ("*.f", mkDoubleNumOp (*))
+  , ("/.f", mkDoubleNumOp (/))
   ]]
+
+mkIntNumOp :: (Int -> Int -> Int) -> Expr
+mkIntNumOp op = NativeFunc (\args -> do
+  case args of
+    [IntExpr x, IntExpr y] -> return $ IntExpr (x `op` y)
+    _         -> throwError "type: invalid arguments")
+
+mkDoubleNumOp :: (Double -> Double -> Double) -> Expr
+mkDoubleNumOp op = NativeFunc (\args -> do
+  case args of
+    [DoubleExpr x, DoubleExpr y] -> return $ DoubleExpr (x `op` y)
+    _         -> throwError "type: invalid arguments")
+
