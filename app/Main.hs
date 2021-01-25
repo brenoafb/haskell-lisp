@@ -13,13 +13,29 @@ import qualified Env as E
 import qualified Data.Text as T
 import qualified Data.Map as M
 
-runProgram :: Env -> Program -> IO ()
-runProgram env [] = putStrLn ""
+loadFile :: Env -> FilePath -> IO (Either Error Env)
+loadFile env f = do
+  input <- T.pack <$> readFile f
+  case parseStr input of
+    Left err -> return $ Left $ T.pack $ show err
+    Right p ->
+      return $ loadProgram env p
+
+loadProgram :: Env -> Program -> Either Error Env
+loadProgram env [] = return env
+loadProgram env (x:xs) =
+  case runState (runExceptT (eval x)) env of
+    (Left err, _)    -> Left err
+    (Right _, env')  -> pure env'
+
+
+runProgram :: Env -> Program -> IO Env
+runProgram env [] = putStrLn "" >> return env
 runProgram env (x:xs) = do
   putStrLn . T.unpack $ "> " <> display x
   case runState (runExceptT (eval x)) env of
     (Left err, env') -> print err >> runProgram env' xs
-    (Right r, env')  -> print r >> runProgram env' xs
+    (Right r, env')  -> putStrLn (T.unpack (display r)) >> runProgram env' xs
 
 main :: IO ()
 main = do
@@ -27,4 +43,5 @@ main = do
   case parseStr input of
     Left err -> print err
     Right p -> do
-      runProgram baseEnv p
+      env <- runProgram baseEnv p
+      return ()
