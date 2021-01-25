@@ -52,7 +52,9 @@ eval (List (x:xs)) = do
   env <- get
   x' <- eval x
   case x' of
-    NativeFunc f -> f xs
+    NativeFunc f -> do
+      args <- mapM eval xs
+      f args
     List [Atom "lambda", List args, body] -> do
       xs' <- mapM eval xs
       names <- getArgNames args
