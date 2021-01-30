@@ -11,7 +11,7 @@ $ stack build
 $ stack run < script.lisp
 ```
 
-## TODO Lisp
+## TODO List
 
 - Experimental type system
 - Optimization using Uniplate
