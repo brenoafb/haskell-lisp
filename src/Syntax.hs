@@ -1,10 +1,7 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Syntax where
 
-import Data.Generics
-import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
 import qualified Data.Map as M
@@ -25,7 +22,10 @@ data Expr = Atom       T.Text
           | NativeFunc ([Expr] -> Eval Expr)
           | List       [Expr]
 
+true :: Expr
 true = Atom "#t"
+
+nil :: Expr
 nil  = List []
 
 instance Show Expr where
@@ -34,7 +34,7 @@ instance Show Expr where
   show (IntExpr x)    = "IntExpr " ++ show x
   show (DoubleExpr x) = "DoubleExpr " ++ show x
   show (Quote x)      = "Quote " ++ show x
-  show (NativeFunc x) = "<native function>"
+  show (NativeFunc _) = "<native function>"
   show (List xs)      = "List " ++ show xs
 
 display :: Expr -> T.Text
@@ -43,7 +43,7 @@ display (Str t)        = "\"" <> t <> "\""
 display (IntExpr x)    = T.pack $ show x
 display (DoubleExpr x) = T.pack $ show x
 display (Quote t)      = "'" <> display t
-display (NativeFunc x) = "<native function>"
+display (NativeFunc _) = "<native function>"
 display (List xs)      = "(" <> T.unwords (map display xs) <> ")"
 
 instance Eq Expr where
@@ -54,4 +54,3 @@ instance Eq Expr where
   (Quote x)      == (Quote y)      = x == y
   (List xs)      == (List ys)      = xs == ys
   _              == _              = False
-

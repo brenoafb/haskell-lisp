@@ -5,12 +5,8 @@ module BaseEnv
   ) where
 
 import Syntax
-import Interpreter
-import Control.Monad.State
 import Control.Monad.Except
-import qualified Env as E
 import qualified Data.Map as M
-import qualified Data.Text as T
 
 baseEnv :: Env
 baseEnv = [M.fromList
@@ -23,7 +19,7 @@ baseEnv = [M.fromList
   , ("car",
      NativeFunc (\args -> do
        case args of
-         [List (x:xs)] -> return x
+         [List (x:_)] -> return x
          _ -> throwError "car: invalid arguments"
      ))
   , ("cdr",
@@ -89,4 +85,3 @@ mkDoubleNumOp op = NativeFunc (\args -> do
   case args of
     [DoubleExpr x, DoubleExpr y] -> return $ DoubleExpr (x `op` y)
     _         -> throwError "type: invalid arguments")
-

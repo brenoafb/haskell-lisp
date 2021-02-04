@@ -3,9 +3,7 @@
 module Parser where
 
 import Syntax
-import Control.Monad
 import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as Token
 import qualified Data.Text as T
@@ -52,7 +50,7 @@ atom = Atom . T.pack <$> identifier
 
 quote :: Parser Expr
 quote = do
-  char '\''
+  _ <- char '\''
   Quote <$> expr
 
 list :: Parser Expr

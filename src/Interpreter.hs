@@ -3,7 +3,6 @@
 module Interpreter where
 
 import Syntax
-import Parser
 import Control.Monad.State
 import Control.Monad.Except
 import qualified Env as E
@@ -28,13 +27,13 @@ eval e@(List []) = return e
 
 eval l@(List [Atom "lambda", List args, body]) = return l
 
-eval (List (Atom "cond" : [])) = return nil
+eval (List [Atom "cond"]) = return nil
 
 eval (List (Atom "cond" : List [cond, conseq] : xs)) = do
   cond' <- eval cond
   if cond' == true
      then eval conseq
-     else eval $ List ((Atom "cond") : xs)
+     else eval $ List (Atom "cond" : xs)
 
 eval (List [Atom "define", Atom n, e]) = do
   e' <- eval e
@@ -49,7 +48,6 @@ eval (List [Atom "let", List args, body]) = do
   return result
 
 eval (List (x:xs)) = do
-  env <- get
   x' <- eval x
   case x' of
     NativeFunc f -> do
