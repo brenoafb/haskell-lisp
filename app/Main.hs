@@ -4,6 +4,7 @@ module Main where
 
 import Syntax
 import Parser
+import Sugar
 import Interpreter
 import Control.Monad.Reader
 import Control.Monad.State
@@ -43,5 +44,5 @@ main = do
   case parseStr input of
     Left err -> print err
     Right p -> do
-      env <- runProgram baseEnv p
+      env <- runProgram baseEnv $ map desugarFunDef p
       return ()

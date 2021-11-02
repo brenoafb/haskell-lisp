@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e1c26ec904f9cde5657b6989e8fb7fe60d9c93405ba2f1c1718f3a1fc15239a9
+-- hash: 788bdc017ce8148da8577ea70beb9385492bd4305f025e6b080b810c0cf8a1af
 
 name:           haskell-lisp
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       Interpreter
       Optimizer
       Parser
+      Sugar
       Syntax
       Typechecker
   other-modules:
