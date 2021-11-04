@@ -82,29 +82,29 @@
         ('#t (elem? x (cdr xs)))))
 
 (define (replace pairs xs)
-    (foldr
-      (lambda (x acc)
-        (cond ((eq? (type x) 'list)
-               (cons (replace pairs x) acc))
-              ('#t
-               (cond ((elem? x (map fst pairs))
-                      (cons (assoc x pairs) acc))
-                     ('#t (cons x acc))))))
-      '()
-      xs))
+  (foldr
+    (lambda (x acc)
+      (cond ((eq? (type x) 'list)
+             (cons (replace pairs x) acc))
+            ('#t
+             (cond ((elem? x (map fst pairs))
+                    (cons (assoc x pairs) acc))
+                   ('#t (cons x acc))))))
+    '()
+    xs))
 
 (define (num-op-template x y)
-     (cond ((and (eq? (type x) 'double)
-                 (eq? (type y) 'double))
-            (__D_OP__ x y))
-           ((and (eq? (type x) 'int)
-                 (eq? (type y) 'int))
-            (__I_OP__ x y))
-           ('#t '())))
+   (cond ((and (eq? (type x) 'double)
+               (eq? (type y) 'double))
+          (__D_OP__ x y))
+         ((and (eq? (type x) 'int)
+               (eq? (type y) 'int))
+          (__I_OP__ x y))
+         ('#t '())))
 
 (define (mk-num-op double-op int-op)
-    (replace (zip '(__D_OP__ __I_OP__) (list double-op int-op))
-             num-op-template))
+  (replace (zip '(__D_OP__ __I_OP__) (list double-op int-op))
+           num-op-template))
 
 (define +
   (mk-num-op '+.f '+.i))
@@ -119,8 +119,8 @@
   (mk-num-op '/.f '/.i))
 
 (define (length xs)
-    (cond ((null? xs) 0)
-          ('#t (+ 1 (length (cdr xs))))))
+  (cond ((null? xs) 0)
+        ('#t (+ 1 (length (cdr xs))))))
 
 
 (cadr '(1 2 3))
