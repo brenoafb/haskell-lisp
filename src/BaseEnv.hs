@@ -2,6 +2,7 @@
 
 module BaseEnv
   ( baseEnv
+  , baseCtx
   ) where
 
 import Syntax
@@ -11,7 +12,8 @@ import qualified Data.Map as M
 baseEnv :: Env
 baseEnv = [M.fromList
   [ ("cons",
-     NativeFunc (\args -> do  -- TODO check if arguments are valid right here (avoid unneeded computation)
+     NativeFunc
+     (\args -> do  -- TODO check if arguments are valid right here (avoid unneeded computation)
        case args of
          [x, List xs] -> return $ List (x:xs)
          _ -> throwError "cons: invalid arguments"
@@ -57,11 +59,15 @@ baseEnv = [M.fromList
         [_]       -> return nil
         _         -> throwError "type: invalid arguments"
      ))
-  , ("neg", NativeFunc (\args -> do
+  , ("neg.i", NativeFunc (\args -> do
       case args of
         [IntExpr x]    -> return $ IntExpr (-x)
+        _ -> throwError "neg.i: invalid arguments"
+     ))
+  , ("neg.d", NativeFunc (\args -> do
+      case args of
         [DoubleExpr x] -> return $ DoubleExpr (-x)
-        _ -> throwError "neg: invalid arguments"
+        _ -> throwError "neg.d: invalid arguments"
      ))
   , ("+.i", mkIntNumOp (+))
   , ("-.i", mkIntNumOp (-))
@@ -85,3 +91,25 @@ mkDoubleNumOp op = NativeFunc (\args -> do
   case args of
     [DoubleExpr x, DoubleExpr y] -> return $ DoubleExpr (x `op` y)
     _         -> throwError "type: invalid arguments")
+
+baseCtx :: Ctx
+baseCtx = [M.fromList
+  [ ("cons",  FuncT [AnyT, ListT, ListT])
+  , ("car",   FuncT [ListT, AnyT])
+  , ("cdr",   FuncT [ListT, ListT])
+  , ("list",  FuncT [AnyT, ListT])
+  , ("eq?",   FuncT [AnyT, AnyT, AtomT])
+  , ("type",  FuncT [AnyT, StrT])
+  , ("null?", FuncT [AnyT, AtomT])
+  , ("neg.i", FuncT [IntT, IntT])
+  , ("neg.f", FuncT [DoubleT, DoubleT])
+  , ("+.i",   FuncT [IntT, IntT, IntT])
+  , ("-.i",   FuncT [IntT, IntT, IntT])
+  , ("*.i",   FuncT [IntT, IntT, IntT])
+  , ("/.i",   FuncT [IntT, IntT, IntT])
+  , ("mod",   FuncT [IntT, IntT, IntT])
+  , ("+.f",   FuncT [DoubleT, DoubleT, DoubleT])
+  , ("-.f",   FuncT [DoubleT, DoubleT, DoubleT])
+  , ("*.f",   FuncT [DoubleT, DoubleT, DoubleT])
+  , ("/.f",   FuncT [DoubleT, DoubleT, DoubleT])
+  ]]

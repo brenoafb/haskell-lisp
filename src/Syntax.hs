@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveFunctor #-}
 
 module Syntax where
 
@@ -9,18 +10,31 @@ import qualified Data.Text as T
 
 type Program = [Expr]
 
-type Frame = M.Map T.Text Expr
+type Ident = T.Text
+type Frame = M.Map Ident Expr
 type Env = [Frame]
 type Error = T.Text
 type Eval t = ExceptT Error (State Env) t
+type CtxFrame = M.Map Ident Type
+type Ctx = [CtxFrame]
 
-data Expr = Atom       T.Text
+data Expr = Atom       Ident
           | Str        T.Text
           | IntExpr    Int
           | DoubleExpr Double
           | Quote      Expr
           | NativeFunc ([Expr] -> Eval Expr)
           | List       [Expr]
+
+data Type = AtomT
+          | StrT
+          | IntT
+          | DoubleT
+          | ListT
+          | NativeT
+          | AnyT
+          | FuncT [Type]
+          deriving (Eq, Show)
 
 true :: Expr
 true = Atom "#t"
@@ -45,6 +59,9 @@ display (DoubleExpr x) = T.pack $ show x
 display (Quote t)      = "'" <> display t
 display (NativeFunc _) = "<native function>"
 display (List xs)      = "(" <> T.unwords (map display xs) <> ")"
+
+displayT :: Type -> T.Text
+displayT = T.pack . show
 
 instance Eq Expr where
   (Atom x)       == (Atom y)       = x == y

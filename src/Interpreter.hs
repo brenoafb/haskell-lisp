@@ -15,11 +15,7 @@ eval e@(Str _) = return e
 eval e@(IntExpr _) = return e
 eval e@(DoubleExpr _) = return e
 
-eval (Atom t) = do
-  env <- get
-  case E.lookup t env of
-    Nothing -> throwError $ "Undefined symbol " <> t
-    Just e -> return e
+eval (Atom t) = E.lookupM t
 
 eval (Quote e) = return e
 
