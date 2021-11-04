@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 788bdc017ce8148da8577ea70beb9385492bd4305f025e6b080b810c0cf8a1af
+-- hash: a0dc1f1920552edf27b5a71d34a153b36627e1d000a0bb021d5ae2dc6866c5b0
 
 name:           haskell-lisp
 version:        0.1.0.0
@@ -42,6 +42,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , haskeline
     , mtl
     , parsec
     , stm
@@ -59,6 +60,7 @@ executable haskell-lisp-exe
   build-depends:
       base >=4.7 && <5
     , containers
+    , haskeline
     , haskell-lisp
     , mtl
     , parsec
@@ -78,6 +80,7 @@ test-suite haskell-lisp-test
   build-depends:
       base >=4.7 && <5
     , containers
+    , haskeline
     , haskell-lisp
     , mtl
     , parsec

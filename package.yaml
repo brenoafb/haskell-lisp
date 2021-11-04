@@ -27,6 +27,7 @@ dependencies:
 - text
 - parsec
 - syb
+- haskeline
 
 library:
   source-dirs: src

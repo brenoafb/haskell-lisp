@@ -4,12 +4,10 @@ module Typechecker
   ) where
 
 import Syntax
-import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
 import qualified Env as E
 import qualified Data.Map as M
-import qualified Data.Text as T
 
 type TypeC t = ExceptT Error (State Ctx) t
 
@@ -22,7 +20,7 @@ getType (NativeFunc _) = pure NativeT
 getType (Quote e) =
   case e of
     (Atom _) -> pure AtomT
-    (List xs) -> pure ListT
+    (List _) -> pure ListT
     _ -> throwError $ "Cannot get type of " <> (display (Quote e))
 getType (List [ Atom "lambda", Atom retType
               , List args, _
@@ -47,6 +45,7 @@ getType l@(List (op:args)) = do
                             <> " and  " <> (displayT $ FuncT argTypes')
                             <> " do not match"
     t -> throwError $ "Invalid function type " <> (displayT t)
+getType (List []) = pure ListT
 
 typecheck :: Expr -> TypeC ()
 typecheck (Str _) = pure ()
@@ -88,11 +87,11 @@ typecheck l@(List [ Atom "define"
                         <> " does not match actual type "
                         <> displayT exprTyp
 
-typecheck l@(List (x:xs)) = getType l >> pure ()
+typecheck l@(List (_:_)) = getType l >> pure ()
 typecheck (List []) = pure ()
 
 getPairName :: Expr -> TypeC Ident
-getPairName (List [Atom n, t]) = pure n
+getPairName (List [Atom n, _]) = pure n
 getPairName x =
   throwError $ "Invalid typed identifier " <> (display x)
 
@@ -116,4 +115,3 @@ getTypeFromIdent "List" = pure ListT
 getTypeFromIdent "Native" = pure ListT
 getTypeFromIdent "Any" = pure AnyT
 getTypeFromIdent t = throwError $ "Unknown type identifier " <> t
-
