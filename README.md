@@ -1,22 +1,31 @@
 # Haskell Lisp
 
-A Lisp implementation in Haskell.
+A purely functional, typechecked Lisp written in Haskell.
 
-Purely functional, no side effects.
+```lisp
+(define ((fib int) (x int))
+  (+.i (fib (-.i x 1) (-.i x 2))))
+
+(define ((elem? bool) (x any) (xs list))
+  (cond ((null? xs) false)
+	((eq? (car xs) x) true)
+	(true (elem? x (cdr xs)))))
+```
 
 Build and run using [Stack](https://docs.haskellstack.org/en/stable/README/).
 
 ```sh
 $ stack build
-$ stack run < script.lisp
+$ stack run script.lisp # run a script
+$ stack run -- -r       # repl
 ```
 
 ## TODO List
 
-- Experimental type system
-- Optimization using Uniplate
+- Actual closures
 - IO capabilities
 - Tail-call optimization
+- General optimization
 
 ## References
 
