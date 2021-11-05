@@ -30,7 +30,7 @@ baseEnv = [M.fromList
          [List (_:xs)] -> return $ List xs
          _ -> throwError "car: invalid arguments"
      ))
-  , ("list",
+  , ("mklist",
      NativeFunc (\args -> do
        return $ List args
      ))
@@ -45,6 +45,7 @@ baseEnv = [M.fromList
       case args of
         [Atom _]       -> return $ Atom "atom"
         [List _]       -> return $ Atom "list"
+        [BoolExpr _]   -> return $ Atom "bool"
         [IntExpr _]    -> return $ Atom "int"
         [DoubleExpr _] -> return $ Atom "double"
         [Str _]        -> return $ Atom "string"
@@ -94,22 +95,22 @@ mkDoubleNumOp op = NativeFunc (\args -> do
 
 baseCtx :: Ctx
 baseCtx = [M.fromList
-  [ ("cons",  FuncT [AnyT, ListT, ListT])
-  , ("car",   FuncT [ListT, AnyT])
-  , ("cdr",   FuncT [ListT, ListT])
-  , ("list",  FuncT [AnyT, ListT])
-  , ("eq?",   FuncT [AnyT, AnyT, AtomT])
-  , ("type",  FuncT [AnyT, StrT])
-  , ("null?", FuncT [AnyT, AtomT])
-  , ("neg.i", FuncT [IntT, IntT])
-  , ("neg.f", FuncT [DoubleT, DoubleT])
-  , ("+.i",   FuncT [IntT, IntT, IntT])
-  , ("-.i",   FuncT [IntT, IntT, IntT])
-  , ("*.i",   FuncT [IntT, IntT, IntT])
-  , ("/.i",   FuncT [IntT, IntT, IntT])
-  , ("mod",   FuncT [IntT, IntT, IntT])
-  , ("+.f",   FuncT [DoubleT, DoubleT, DoubleT])
-  , ("-.f",   FuncT [DoubleT, DoubleT, DoubleT])
-  , ("*.f",   FuncT [DoubleT, DoubleT, DoubleT])
-  , ("/.f",   FuncT [DoubleT, DoubleT, DoubleT])
+  [ ("cons",    FuncT [AnyT, ListT, ListT])
+  , ("car",     FuncT [ListT, AnyT])
+  , ("cdr",     FuncT [ListT, ListT])
+  , ("mklist",  FuncT [AnyT, ListT])
+  , ("eq?",     FuncT [AnyT, AnyT, BoolT])
+  , ("type",    FuncT [AnyT, StrT])
+  , ("null?",   FuncT [AnyT, BoolT])
+  , ("neg.i",   FuncT [IntT, IntT])
+  , ("neg.f",   FuncT [DoubleT, DoubleT])
+  , ("+.i",     FuncT [IntT, IntT, IntT])
+  , ("-.i",     FuncT [IntT, IntT, IntT])
+  , ("*.i",     FuncT [IntT, IntT, IntT])
+  , ("/.i",     FuncT [IntT, IntT, IntT])
+  , ("mod",     FuncT [IntT, IntT, IntT])
+  , ("+.f",     FuncT [DoubleT, DoubleT, DoubleT])
+  , ("-.f",     FuncT [DoubleT, DoubleT, DoubleT])
+  , ("*.f",     FuncT [DoubleT, DoubleT, DoubleT])
+  , ("/.f",     FuncT [DoubleT, DoubleT, DoubleT])
   ]]

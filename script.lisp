@@ -1,37 +1,37 @@
-(define (cadr x)
+(define ((cadr any) (x list))
   (car (cdr x)))
 
-(define (caddr x)
+(define ((caddr any) (x list))
   (car (cdr (cdr x))))
 
-(define (caar x)
+(define ((caar any (x list))
   (car (car x)))
 
-(define (cadar x)
+(define ((cadar any) (x list))
   (car (cdr (car x))))
 
-(define (and x y)
-  (cond (x (cond (y '#t)))
-        ('#t '())))
+(define ((and bool) (x bool) (y bool))
+  (cond (x (cond (y true)))
+	(true false)))
 
 (define (or x y)
   (cond (x '#t)
-        (y '#t)
-        ('#t '())))
+	(y '#t)
+	('#t '())))
 
 (define (not x)
   (cond (x '())
-        ('#t '#t)))
+	('#t '#t)))
 
 (define (atom? x)
   (cond ((eq? (type x) 'atom) '#t)
-        ('#t '())))
+	('#t '())))
 
 (define (zip x y)
   (cond ((and (null? x) (null? y)) '())
-        ((and (not (atom? x)) (not (atom? y)))
-         (cons (list (car x) (car y))
-               (zip (cdr x) (cdr y))))))
+	((and (not (atom? x)) (not (atom? y)))
+	 (cons (list (car x) (car y))
+	       (zip (cdr x) (cdr y))))))
 
 (define (fst pair)
   (car pair))
@@ -41,24 +41,24 @@
 
 (define (map f xs)
   (cond ((null? xs) '())
-        ('#t (cons (f (car xs))
-                   (map f (cdr xs))))))
+	('#t (cons (f (car xs))
+		   (map f (cdr xs))))))
 
 (define (filter p xs)
   (cond ((null? xs) '())
-        ((p (car xs))
-         (cons (car xs)
-               (filter p (cdr xs))))
-        ('#t (filter p (cdr xs)))))
+	((p (car xs))
+	 (cons (car xs)
+	       (filter p (cdr xs))))
+	('#t (filter p (cdr xs)))))
 
 (define (even? x)
   (cond ((eq? (mod x 2) 0) '#t)
-        ('#t '())))
+	('#t '())))
 
 (define (foldr f x0 xs)
   (cond ((null? xs) x0)
-        ('#t (f (car xs)
-                (foldr f x0 (cdr xs))))))
+	('#t (f (car xs)
+		(foldr f x0 (cdr xs))))))
 
 (define (sum.i xs)
   (foldr +.i 0 xs))
@@ -74,37 +74,37 @@
 
 (define (assoc x y)
   (cond ((eq? (caar y) x) (cadar y))
-        ('#t (assoc x (cdr y)))))
+	('#t (assoc x (cdr y)))))
 
 (define (elem? x xs)
   (cond ((null? xs) '())
-        ((eq? (car xs) x) '#t)
-        ('#t (elem? x (cdr xs)))))
+	((eq? (car xs) x) '#t)
+	('#t (elem? x (cdr xs)))))
 
 (define (replace pairs xs)
   (foldr
     (lambda (x acc)
       (cond ((eq? (type x) 'list)
-             (cons (replace pairs x) acc))
-            ('#t
-             (cond ((elem? x (map fst pairs))
-                    (cons (assoc x pairs) acc))
-                   ('#t (cons x acc))))))
+	     (cons (replace pairs x) acc))
+	    ('#t
+	     (cond ((elem? x (map fst pairs))
+		    (cons (assoc x pairs) acc))
+		   ('#t (cons x acc))))))
     '()
     xs))
 
 (define (num-op-template x y)
    (cond ((and (eq? (type x) 'double)
-               (eq? (type y) 'double))
-          (__D_OP__ x y))
-         ((and (eq? (type x) 'int)
-               (eq? (type y) 'int))
-          (__I_OP__ x y))
-         ('#t '())))
+	       (eq? (type y) 'double))
+	  (__D_OP__ x y))
+	 ((and (eq? (type x) 'int)
+	       (eq? (type y) 'int))
+	  (__I_OP__ x y))
+	 ('#t '())))
 
 (define (mk-num-op double-op int-op)
   (replace (zip '(__D_OP__ __I_OP__) (list double-op int-op))
-           num-op-template))
+	   num-op-template))
 
 (define +
   (mk-num-op '+.f '+.i))
@@ -120,7 +120,7 @@
 
 (define (length xs)
   (cond ((null? xs) 0)
-        ('#t (+ 1 (length (cdr xs))))))
+	('#t (+ 1 (length (cdr xs))))))
 
 
 (cadr '(1 2 3))

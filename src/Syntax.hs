@@ -22,11 +22,13 @@ data Expr = Atom       Ident
           | Str        T.Text
           | IntExpr    Int
           | DoubleExpr Double
+          | BoolExpr   Bool
           | Quote      Expr
           | NativeFunc ([Expr] -> Eval Expr)
           | List       [Expr]
 
 data Type = AtomT
+          | BoolT
           | StrT
           | IntT
           | DoubleT
@@ -37,7 +39,10 @@ data Type = AtomT
           deriving (Eq, Show)
 
 true :: Expr
-true = Atom "#t"
+true = BoolExpr True
+
+false :: Expr
+false = BoolExpr False
 
 nil :: Expr
 nil  = List []
@@ -45,6 +50,7 @@ nil  = List []
 instance Show Expr where
   show (Atom t)       = T.unpack $ "Atom " <> t
   show (Str t)        = T.unpack $ "Str " <> "\"" <> t <> "\""
+  show (BoolExpr b)   = "BoolExpr " ++ show b
   show (IntExpr x)    = "IntExpr " ++ show x
   show (DoubleExpr x) = "DoubleExpr " ++ show x
   show (Quote x)      = "Quote " ++ show x
@@ -54,6 +60,7 @@ instance Show Expr where
 display :: Expr -> T.Text
 display (Atom t)       = t
 display (Str t)        = "\"" <> t <> "\""
+display (BoolExpr b)       = T.pack $ show b
 display (IntExpr x)    = T.pack $ show x
 display (DoubleExpr x) = T.pack $ show x
 display (Quote t)      = "'" <> display t
@@ -66,6 +73,7 @@ displayT = T.pack . show
 instance Eq Expr where
   (Atom x)       == (Atom y)       = x == y
   (Str  x)       == (Str  y)       = x == y
+  (BoolExpr x)   == (BoolExpr y)   = x == y
   (IntExpr x)    == (IntExpr y)    = x == y
   (DoubleExpr x) == (DoubleExpr y) = x == y
   (Quote x)      == (Quote y)      = x == y

@@ -12,6 +12,7 @@ import qualified Data.Text as T
 eval :: Expr -> Eval Expr
 
 eval e@(Str _) = return e
+eval e@(BoolExpr _) = return e
 eval e@(IntExpr _) = return e
 eval e@(DoubleExpr _) = return e
 
@@ -21,7 +22,7 @@ eval (Quote e) = return e
 
 eval e@(List []) = return e
 
-eval l@(List [Atom "lambda", List args, body]) = return l
+eval l@(List [Atom "lambda", List _, _]) = return l
 
 eval (List [Atom "cond"]) = return nil
 

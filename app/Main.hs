@@ -35,15 +35,15 @@ runProgram :: Env -> Program -> InputT IO Env
 runProgram env [] = outputStrLn "" >> pure env
 runProgram env (x:xs) = do
   case runState (runExceptT (eval x)) env of
-    (Left err, env') -> outputStrLn (show err) >> runProgram env' xs
-    (Right r, env')  -> outputStrLn (T.unpack (display r)) >> runProgram env' xs
+    (Left err, env') -> outputStr (show err) >> runProgram env' xs
+    (Right r, env')  -> outputStr (T.unpack (display r)) >> runProgram env' xs
 
 typecheckProgram :: Ctx -> Program -> InputT IO Ctx
 typecheckProgram ctx [] = outputStrLn "" >> pure ctx
 typecheckProgram ctx (x:xs) = do
-  case runState (runExceptT (typecheck x)) ctx of
-    (Left err, ctx') -> outputStrLn (show err) >> typecheckProgram ctx' xs
-    (Right (), ctx')  -> outputStrLn "Ok" >> typecheckProgram ctx' xs
+  case runState (runExceptT (getType x)) ctx of
+    (Left err, ctx') -> outputStr (show err) >> typecheckProgram ctx' xs
+    (Right typ, ctx')  -> outputStr (show typ) >> typecheckProgram ctx' xs
 
 main :: IO ()
 main = runInputT defaultSettings (repl baseEnv baseCtx)
