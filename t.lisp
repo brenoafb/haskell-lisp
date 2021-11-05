@@ -1,12 +1,10 @@
-(define ((succ Int) (x Int))
-  (+ x 1))
+(define ((succ int) (x int)) (+.i x 1))
 
 (succ 1)
 
 (succ "a")
 
-(define ((succ2 Any) (x Int))
-  (succ (succ x)))
+(define ((succ2 any) (x int)) (succ (succ x)))
 
 (succ (succ 2))
 

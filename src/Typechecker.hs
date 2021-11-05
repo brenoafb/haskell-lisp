@@ -8,7 +8,6 @@ import Control.Monad.State
 import Control.Monad.Except
 import qualified Env as E
 import qualified Data.Map as M
-
 import Data.List (group)
 
 type TypeC t = ExceptT Error (State Ctx) t
@@ -84,7 +83,7 @@ getType l@(List (op:args)) = do
     FuncT fType' -> do
       let argTypes = init fType'
       argTypes' <- mapM getType args
-      if argTypes == argTypes' || argTypes == [AnyT]
+      if matchTypes argTypes argTypes' || argTypes == [AnyT]
          then pure $ last fType'
          else throwError $ "Type error in function call: "
                             <> (display l)
@@ -96,49 +95,11 @@ getType l@(List (op:args)) = do
 
 getType (List []) = pure ListT
 
--- typecheck :: Expr -> TypeC ()
--- typecheck (Str _) = pure ()
--- typecheck (BoolExpr _) = pure ()
--- typecheck (IntExpr _) = pure ()
--- typecheck (DoubleExpr _) = pure ()
--- typecheck (Quote _) = pure ()
--- typecheck (NativeFunc _) = pure ()
--- typecheck (Atom _) = pure ()
--- typecheck l@(List [ Atom "lambda", retType
---                   , List args, body
---                   ]
---             ) = do
---   ret      <- getTypeFromIdentifier retType
---   argTypes <- mapM getPairType args
---   argNames <- mapM getPairName args
---   let frame = M.fromList $ zip argNames argTypes
---   modify (E.push frame)
---   bodyType <- getType body
---   modify E.pop
---   if ret == bodyType || ret == AnyT || bodyType == AnyT
---      then pure ()
---      else throwError $ "Type error in lambda abstraction: "
---                        <> (display l)
---                        <> "\n"
---                        <> "Return type " <> (display retType)
---                        <> " and body type " <> (displayT bodyType)
---                        <> " do not match"
--- typecheck l@(List [ Atom "define"
---                   , List [Atom name, typ]
---                   , expr
---                   ]) = do
---   typ' <- getTypeFromIdentifier typ
---   exprTyp <- getType expr
---   if typ' == exprTyp
---      then modify (E.insert name typ')
---      else throwError $ "Type error in definition "
---                         <> (display l)
---                         <> "\nType signature " <> display typ
---                         <> " does not match actual type "
---                         <> displayT exprTyp
---
--- typecheck l@(List (_:_)) = getType l >> pure ()
--- typecheck (List []) = pure ()
+matchTypes :: [Type] -> [Type] -> Bool
+matchTypes [] [] = True
+matchTypes (x:xs) (y:ys)
+  | x == y || x == AnyT || y == AnyT = matchTypes xs ys
+  | otherwise = False
 
 getPairName :: Expr -> TypeC Ident
 getPairName (List [Atom n, _]) = pure n

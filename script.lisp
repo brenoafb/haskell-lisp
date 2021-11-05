@@ -182,9 +182,9 @@ pairs
 
 (prod.i '(1 2 3 4 5 6))
 
-(foldr and '#t (map even? '(1 2 3 4 5)))
+(foldr and true (map even? '(1 2 3 4 5)))
 
-(foldr and '#t (map even? '(0 2 4 6 8)))
+(foldr and true (map even? '(0 2 4 6 8)))
 
 (all even? '(1 2 3 4 5))
 

@@ -12,23 +12,28 @@ import BaseEnv
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
+import System.Environment
 import System.Console.Haskeline hiding (display)
 import qualified Data.Text as T
 
-loadFile :: Env -> FilePath -> IO (Either Error Env)
-loadFile env f = do
+loadFile :: Env -> Ctx -> FilePath -> IO (Env, Ctx)
+loadFile env ctx f = do
   input <- T.pack <$> readFile f
   case parseStr input of
-    Left err -> return $ Left $ T.pack $ show err
-    Right p ->
-      return $ loadProgram env p
+    Left err -> putStrLn (show err) >> pure (env, ctx)
+    Right p  -> loadProgram env ctx (map desugar p)
 
-loadProgram :: Env -> Program -> Either Error Env
-loadProgram env [] = return env
-loadProgram env (x:_) =
-  case runState (runExceptT (eval x)) env of
-    (Left err, _)    -> Left err
-    (Right _, env')  -> pure env'
+loadProgram :: Env -> Ctx -> Program -> IO (Env, Ctx)
+loadProgram env ctx [] = pure (env, ctx)
+loadProgram env ctx (x:xs) = do
+  putStr $ (T.unpack $ display x) <> " // " <> (T.unpack . display $ removeTypes x) <> " // "
+  case runState (runExceptT (getType x)) ctx of
+    (Left err, ctx')  -> putStrLn (show err) >> pure (env, ctx)
+    (Right typ, ctx') -> do
+      putStr $ (show typ) <> " "
+      case runState (runExceptT (eval (removeTypes x))) env of
+        (Left err, _)    -> putStrLn (show err) >> pure (env, ctx)
+        (Right result, env')  -> putStrLn (show result) >> loadProgram env' ctx' xs
 
 
 runProgram :: Env -> Program -> InputT IO Env
@@ -42,27 +47,34 @@ typecheckProgram :: Ctx -> Program -> InputT IO Ctx
 typecheckProgram ctx [] = outputStrLn "" >> pure ctx
 typecheckProgram ctx (x:xs) = do
   case runState (runExceptT (getType x)) ctx of
-    (Left err, ctx') -> outputStr (show err) >> typecheckProgram ctx' xs
-    (Right typ, ctx')  -> outputStr (show typ) >> typecheckProgram ctx' xs
+    (Left err, ctx')  -> outputStr (show err) >> typecheckProgram ctx' xs
+    (Right typ, ctx') -> outputStr (show typ) >> typecheckProgram ctx' xs
 
 main :: IO ()
-main = runInputT defaultSettings (repl baseEnv baseCtx)
-  where repl :: Env -> Ctx -> InputT IO ()
-        repl env ctx = do
-          input <- getInputLine "> "
-          case input of
-            Nothing -> pure ()
-            Just input' ->
-              case parseStr (T.pack input') of
-                Left err -> liftIO (print err) >> repl env ctx
-                Right p  -> do
-                  let p' = map desugar p
-                      p'' = map removeTypes p'
-                  outputStrLn $ "desugared: " <> (T.unpack $ mconcat $ map display p')
-                  outputStrLn $ "detyped: " <> (T.unpack $ mconcat $ map display p'')
-                  ctx' <- typecheckProgram ctx p'
-                  env' <- runProgram env p''
-                  repl env' ctx'
+main = do
+  args <- getArgs
+  case args of
+    ["-r"] -> runInputT defaultSettings (repl baseEnv baseCtx)
+    ["-l"] -> undefined -- TODO load file then start repl
+    [filename] -> loadFile baseEnv baseCtx filename >> pure ()
+    [] -> undefined
+
+repl :: Env -> Ctx -> InputT IO ()
+repl env ctx = do
+  input <- getInputLine "> "
+  case input of
+    Nothing -> pure ()
+    Just input' ->
+      case parseStr (T.pack input') of
+        Left err -> liftIO (print err) >> repl env ctx
+        Right p  -> do
+          let p' = map desugar p
+              p'' = map removeTypes p'
+          outputStrLn $ "desugared: " <> (T.unpack $ mconcat $ map display p')
+          outputStrLn $ "detyped: " <> (T.unpack $ mconcat $ map display p'')
+          ctx' <- typecheckProgram ctx p'
+          env' <- runProgram env p''
+          repl env' ctx'
 
 removeTypes :: Expr -> Expr
 removeTypes (List [Atom "define", List [name, _], e]) =
